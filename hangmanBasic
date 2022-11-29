@@ -1,0 +1,39 @@
+$var1 = "Hello World"
+Write-Output $var1
+
+$word = Get-Random -InputObject (get-content .\dict.txt)
+$permWord = $word
+$incorrectLetters = ""
+$correctLetters = ""
+$one = 1
+
+Write-Output "Word is $word"
+
+while ($one -eq 1){
+
+    $userInput = Read-Host "Enter guess"
+    Write-Output $userInput
+    
+
+    #Checks if a letter is in the word
+    if ($word.contains($userInput)){
+        Write-Output "You got a letter"
+        $word = $word -replace $userInput,''
+        #Write-Output $word
+    }else{
+        $incorrectLetters = $incorrectLetters + $userInput
+        Write-Output "Your guesses have been $incorrectLetters"
+    }
+
+    #Checks if all letters were guessed
+    if ($word -eq ""){
+        Write-Output "You got the word, it was $permWord"
+        $one = 0
+    }
+
+    #Exit
+    if ($userInput -eq "z"){
+        $one = 0
+    }
+
+}
