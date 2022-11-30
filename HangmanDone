@@ -1,0 +1,121 @@
+cls
+
+#Pulls a word from the dictionary, also allows for specifying a word for demos
+$permWord = Get-Random -InputObject (get-content .\dict.txt)
+#$permWord = "cat"
+
+#Making global variables so any function can access them.
+$incorrectLetters = ""
+$correctLetters = ""
+$gameLoop = $True
+$arr = "-"*$permWord.length
+$arr2 = $arr
+$arr3 = @()
+$trys = 0
+Write-Output "Hangman 0.22"
+
+
+# This draws the hung man
+function deadman
+{
+    #Switch for each number of wrong guesses
+    switch($trys)
+    {
+        '0' {"-----`n    |`n    |`n    |`n    |`n    |"}
+        '1' {"-----`n  | |`n  O |`n    |`n    |`n    |"}
+        '2' {"-----`n  | |`n  O |`n \| |`n    |`n    |"}
+        '3' {"-----`n  | |`n  O |`n \|/|`n    |`n    |"}
+        '4' {"-----`n  | |`n  O |`n \|/|`n  | |`n    |"}
+        '5' {"-----`n  | |`n  O |`n \|/|`n  | |`n /  |"}
+        '6' {"-----`n  | |`n  O |`n \|/|`n  | |`n / \|"}
+    }
+}
+
+
+# Makes the string for the letters in the correct word, and replaces the - with a letter
+function display($correctWord, $guess, $dashes)
+{
+    # pass the guess and see contained in word
+    for ($i = 0; $i -lt $correctWord.length; $i++)
+    { 
+        # if letter guessed matches correct letter word
+        if($guess -eq $correctWord[$i])
+        {
+            # change dash into letter
+            $dashes = $dashes.Insert($i, $guess)
+            $dashes = $dashes.Remove($i+1,1)
+        }
+    }
+    return $dashes
+
+    # right adds a letter
+}
+
+
+# Main game loop
+function game() {
+    while ($gameLoop){
+
+        # Gets the user's guess
+        $userInput = Read-Host "`nEnter guess"
+
+        # Checks if the user's guess is in the word
+        if ($permWord.contains($userInput)){
+        
+            # Let the user know their guess was correct
+            Write-Output "You got a letter"
+
+            # Change dashes into letters
+            $arr2 = display $permWord $userInput $arr2
+            deadman $trys
+            $arr2
+
+            # stores wrong letters
+            $incorrectLetters = $incorrectLetters + $userInput
+            Write-Output "Your guesses have been $incorrectLetters"
+
+            # Checks if the user won
+            if($arr2 -inotmatch "-"){
+                "You WON!"
+                $gameLoop = $False
+            }
+
+         # Goes here if the user's guess was wrong
+        }else{
+
+            # Stores wrong guesses
+            $incorrectLetters = $incorrectLetters + $userInput
+            $trys ++
+            
+            # Print the man being hung
+            deadman $trys
+            $arr2
+
+            # Show wrong letters guessed
+            Write-Output "Your guesses have been $incorrectLetters"
+
+            # If the user lost
+            if($trys -eq 6)
+            {
+                
+                # Spams the user with getting pwned and calculators
+                for ($i = 1; $i -lt 9; $i++)
+                { 
+                    "GET PWNED SCRUB the word was $permWord"
+                    calc.exe
+                    Start-Sleep -Seconds 0.1
+                }
+
+                # Exits the program
+                $gameLoop = $False
+            }
+
+
+            
+        }
+
+
+    }
+}
+
+game
